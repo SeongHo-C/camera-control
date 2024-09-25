@@ -97,6 +97,7 @@ class App(QMainWindow):
         self.sliders2 = {}
         self.slider_labels2 = {}
         self.parameters2 = {
+            "확대/축소(Z)": (cv2.CAP_PROP_ZOOM, 0, 60, 1, 0),
             "포커스(F)": (cv2.CAP_PROP_FOCUS, 0, 1023, 1, 0),
             "노출(E)": (cv2.CAP_PROP_EXPOSURE, -13, 0, 1, -6),
         }
@@ -207,7 +208,7 @@ class App(QMainWindow):
         self.sliders2[cv2.CAP_PROP_EXPOSURE].setEnabled(False)
       else:
         self.thread.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)  # 노출 자동 비활성화
-        self.sliders2[cv2.CAP_PROP_EXPOSURE].setEnabled(True)
+        self.sliders2[cv2.CAP_PROP_EXPOSURE].setEnabled(True)   
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
