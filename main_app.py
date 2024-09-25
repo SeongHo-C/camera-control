@@ -36,12 +36,12 @@ class App(QMainWindow):
         self.parameters = {
             "밝기(B)": (cv2.CAP_PROP_BRIGHTNESS, -64, 64, 1, 0),
             "대비(C)": (cv2.CAP_PROP_CONTRAST, 0, 95, 1, 0),
-            "채도(S)": (cv2.CAP_PROP_SATURATION, 0, 255, 1, 66),
+            "채도(S)": (cv2.CAP_PROP_SATURATION, 0, 255, 1, 100),
             "색상(H)": (cv2.CAP_PROP_HUE, -2000, 2000, 1, 0),
             "선명도(P)": (cv2.CAP_PROP_SHARPNESS, 0, 7, 1, 0),
             "감마(G)": (cv2.CAP_PROP_GAMMA, 64, 300, 1, 100),
             "화이트 밸런스(W)": (cv2.CAP_PROP_WHITE_BALANCE_BLUE_U, 2800, 6500, 1, 2800),
-            "후광 보정(B)": (cv2.CAP_PROP_BACKLIGHT, 36, 160, 1, 84),
+            "후광 보정(B)": (cv2.CAP_PROP_BACKLIGHT, 36, 160, 1, 50),
         }
         self.create_sliders()
 
@@ -81,6 +81,9 @@ class App(QMainWindow):
 
         self.start_button = QPushButton("촬영 시작")
         self.stop_button = QPushButton("촬영 중지")
+
+        self.start_button.clicked.connect(self.start_recording)
+        self.stop_button.clicked.connect(self.stop_recording)
 
         self.setup_button_style(self.start_button)
         self.setup_button_style(self.stop_button)
@@ -169,7 +172,14 @@ class App(QMainWindow):
             self.sliders2[cv2.CAP_PROP_EXPOSURE].setEnabled(False)
         else:
             self.thread.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)
-            self.sliders2[cv2.CAP_PROP_EXPOSURE].setEnabled(True)   
+            self.sliders2[cv2.CAP_PROP_EXPOSURE].setEnabled(True)  
+
+    def start_recording(self):
+      self.thread.start_recording()
+
+    def stop_recording(self):
+      self.thread.stop_recording()
+ 
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
