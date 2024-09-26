@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QSlider, QPushButton, QVBoxLayout, QGridLayout, QWidget, QHBoxLayout, QTabWidget, QCheckBox
 from video_thread import VideoThread
+from styles import button_style
 
 class App(QMainWindow):
     def __init__(self):
@@ -85,8 +86,8 @@ class App(QMainWindow):
         self.start_button.clicked.connect(self.start_recording)
         self.stop_button.clicked.connect(self.stop_recording)
 
-        self.setup_button_style(self.start_button)
-        self.setup_button_style(self.stop_button)
+        button_style(self.start_button)
+        button_style(self.stop_button)
 
         self.button_layout.addWidget(self.start_button)
         self.button_layout.addWidget(self.stop_button)
@@ -135,21 +136,6 @@ class App(QMainWindow):
         self.thread.cap.set(prop, value)
         self.slider_labels2[name].setText(f"{name}: {value}")
 
-    def setup_button_style(self, button):
-        button.setStyleSheet("""
-          QPushButton {
-              background-color: white; 
-              color: black;               
-              border: 1px solid gray;   
-              border-radius: 5px;          
-              padding: 5px 10px;           
-          }
-          QPushButton:hover {
-              background-color: gray;
-              color: white;  
-          }
-        """)
-
     def toggle_auto_wb(self, state):
         if state == Qt.Checked:
             self.thread.cap.set(cv2.CAP_PROP_AUTO_WB, 1)
@@ -175,11 +161,10 @@ class App(QMainWindow):
             self.sliders2[cv2.CAP_PROP_EXPOSURE].setEnabled(True)  
 
     def start_recording(self):
-      self.thread.start_recording()
+        self.thread.start_recording()
 
     def stop_recording(self):
-      self.thread.stop_recording()
- 
+        self.thread.stop_recording()
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
