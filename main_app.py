@@ -147,10 +147,10 @@ class App(QMainWindow):
             self.camera_control_sliders[cv2.CAP_PROP_EXPOSURE].setEnabled(True)  
 
     def start_recording(self):
-        self.thread.start_recording()
+        self.thread.start_capturing()
 
     def stop_recording(self):
-        self.thread.stop_recording()
+        self.thread.stop_capturing()
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
@@ -162,7 +162,7 @@ class App(QMainWindow):
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
-        p = convert_to_Qt_format.scaled(640, 480, Qt.KeepAspectRatio)
+        p = convert_to_Qt_format.scaled(800, 600, Qt.KeepAspectRatio)
         return QPixmap.fromImage(p)
 
     def closeEvent(self, event):

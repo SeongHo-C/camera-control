@@ -13,13 +13,13 @@ class VideoThread(QThread):
     def __init__(self):
         super().__init__()
         self.cap = cv2.VideoCapture(1)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 960)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 800)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 600)
+        self.cap.set(cv2.CAP_PROP_FPS, 30)
+
         self.running = False
-        self.recording = False
-        self.fps = 30
-        self.output = None
-        self.start_time = None
+        self.capturing = False
+        self.last_captured_time = None
 
     def run(self):
         while self.running:
@@ -27,50 +27,38 @@ class VideoThread(QThread):
             if ret:
                 # 현재 프레임이 수신되었음을 GUI에 알리고, 그 프레임을 신호와 함께 전송
                 self.change_pixmap_signal.emit(frame)
-                if self.recording:
-                    # VideoWriter 객체 생성 여부 확인
-                    if self.output is None:
-                        self.start_new_recording()
-                    self.output.write(frame)
 
-                    if datetime.now() - self.start_time > timedelta(minutes=10):
-                        self.stop_current_recording()
-                        self.start_new_recording()
-    
+                # 1초에 한 번만 캡처
+                if self.capturing and (self.last_captured_time is None or (datetime.now() - self.last_captured_time).seconds >= 1):
+                    self.capture_frame(frame)
+                    self.last_captured_time = datetime.now()
+
     def start(self):
         self.running = True
         # 새 스레드를 생성하고 시작하는 핵심적인 부분, 이를 통해 run() 메서드가 별도의 스레드에서 실행
         super().start()
 
-    # def stop(self):
-    #     self.running = False
-    #     self.stop_recording()
-    #     self.wait()
-    #     self.cap.release()
+    def stop(self):
+        self.running = False
+        self.wait()
+        self.cap.release()
 
-    def start_recording(self):
-        self.recording = True
-        self.start_new_recording()
+    def start_capturing(self):
+        self.capturing = True
 
-    def stop_recording(self):
-        self.recording = False
-        self.stop_current_recording()              
+    def stop_capturing(self):
+        self.capturing = False
 
-    def start_new_recording(self):
-        self.start_time = datetime.now()
-        date_str = self.start_time.strftime("%Y%m%d")
-        time_str = self.start_time.strftime("%H%M%S")
+    def capture_frame(self, frame):
+        current_time = datetime.now()
         
-        folder_path = os.path.join("recordings", date_str)
+        date_str = current_time.strftime('%Y%m%d')
+        time_str = current_time.strftime('%H%M%S')
+        
+        folder_path = os.path.join('captures', date_str)
         os.makedirs(folder_path, exist_ok=True)
         
-        file_name = f"{time_str}.avi"
+        file_name = f'{time_str}.jpg'
         file_path = os.path.join(folder_path, file_name)
         
-        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        self.output = cv2.VideoWriter(file_path, fourcc, self.fps, (1280, 960))
-
-    def stop_current_recording(self):
-        if self.output is not None:
-            self.output.release()
-            self.output = None
+        cv2.imwrite(file_path, frame)
