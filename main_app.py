@@ -42,7 +42,7 @@ class App(QMainWindow):
             "색상(H)": (cv2.CAP_PROP_HUE, -2000, 2000, 1, 0),
             "선명도(P)": (cv2.CAP_PROP_SHARPNESS, 0, 7, 1, 0),
             "감마(G)": (cv2.CAP_PROP_GAMMA, 64, 300, 1, 100),
-            "화이트 밸런스(W)": (cv2.CAP_PROP_WHITE_BALANCE_BLUE_U, 2800, 6500, 1, 2800),
+            "화이트 밸런스(W)": (cv2.CAP_PROP_WHITE_BALANCE_BLUE_U, 0, 1, 1, 0),
             "후광 보정(B)": (cv2.CAP_PROP_BACKLIGHT, 36, 160, 1, 50),
         }
         self.create_sliders(self.video_amp_parameters, self.video_amp_sliders, self.video_amp_slider_labels, self.video_amp_slider_layout)
@@ -68,7 +68,7 @@ class App(QMainWindow):
         self.camera_control_parameters = {
             "확대/축소(Z)": (cv2.CAP_PROP_ZOOM, 0, 60, 1, 0),
             "포커스(F)": (cv2.CAP_PROP_FOCUS, 0, 1023, 1, 0),
-            "노출(E)": (cv2.CAP_PROP_EXPOSURE, -13, 0, 1, -6),
+            "노출(E)": (cv2.CAP_PROP_EXPOSURE, 1, 8188, 1, 1000),
         }
         self.create_sliders(self.camera_control_parameters, self.camera_control_sliders, self.camera_control_slider_labels, self.camera_control_slider_layout)
 
@@ -120,7 +120,8 @@ class App(QMainWindow):
 
     def update_camera_setting(self, prop, value, name, slider_labels):
         self.thread.cap.set(prop, value)
-        slider_labels[name].setText(f"{name}: {value}")
+        actual_value = self.thread.cap.get(prop)
+        slider_labels[name].setText(f"{name}: {int(actual_value)}")
 
     def toggle_auto_wb(self, state):
         if state == Qt.Checked:
@@ -140,10 +141,10 @@ class App(QMainWindow):
 
     def toggle_auto_exposure(self, state):
         if state == Qt.Checked:
-            self.thread.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.75)
+            self.thread.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)
             self.camera_control_sliders[cv2.CAP_PROP_EXPOSURE].setEnabled(False)
         else:
-            self.thread.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)
+            self.thread.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
             self.camera_control_sliders[cv2.CAP_PROP_EXPOSURE].setEnabled(True)  
 
     def start_recording(self):

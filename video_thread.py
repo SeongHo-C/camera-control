@@ -12,10 +12,14 @@ class VideoThread(QThread):
 
     def __init__(self):
         super().__init__()
-        self.cap = cv2.VideoCapture(1)
+        self.cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 800)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 600)
+        self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
         self.cap.set(cv2.CAP_PROP_FPS, 30)
+
+        actual_fps = self.cap.get(cv2.CAP_PROP_FPS)
+        print(f'실제 설정 FPS: {actual_fps}')
 
         self.running = False
         self.capturing = False
