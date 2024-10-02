@@ -1,7 +1,7 @@
 import cv2
 
 # 카메라 초기화
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 # 파라미터 목록 및 해당 OpenCV 속성
 parameters = {
@@ -13,6 +13,8 @@ parameters = {
     "Gamma": cv2.CAP_PROP_GAMMA,
     "White Balance": cv2.CAP_PROP_WHITE_BALANCE_BLUE_U,
     "Backlight Contrast": cv2.CAP_PROP_BACKLIGHT,
+    "Zoom": cv2.CAP_PROP_ZOOM,
+    "Focus": cv2.CAP_PROP_FOCUS,
     "Exposure": cv2.CAP_PROP_EXPOSURE
 }
 
