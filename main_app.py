@@ -22,6 +22,17 @@ class App(QMainWindow):
         self.tabs = QTabWidget()
         self.main_layout.addWidget(self.tabs)
 
+        self.recording_label = QLabel(self)
+        self.recording_label.setAlignment(Qt.AlignCenter)
+
+        camera_icon = QPixmap('./images/camera.png')
+        self.recording_label.setPixmap(camera_icon)
+        self.recording_label.setStyleSheet("color: red; font-size: 16px")
+        self.recording_label.setText('촬영중')
+
+        self.main_layout.addWidget(self.recording_label)
+        # self.recording_label.hide()
+
 # 비디오 프로세서 앰프 ------------------------------------------------------------------------------------------------         
         self.video_amp_tab = QWidget()
         self.tabs.addTab(self.video_amp_tab, "비디오 프로세서 앰프")
