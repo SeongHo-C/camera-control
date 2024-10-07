@@ -14,24 +14,33 @@ class App(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
+        VIDEO_WIDTH = 800
+        VIDEO_HEIGHT = 600
+
         self.main_layout = QVBoxLayout(self.central_widget)
 
+        self.video_container = QWidget()
+        self.video_container_layout = QHBoxLayout(self.video_container)
+        self.video_container_layout.setContentsMargins(0, 0, 0, 0)
+        self.video_container.setFixedSize(VIDEO_WIDTH, VIDEO_HEIGHT)
+
         self.video_label = QLabel(self)
-        self.main_layout.addWidget(self.video_label)
+        self.video_label.setFixedSize(VIDEO_WIDTH, VIDEO_HEIGHT)
+
+        self.recording_label = QLabel(self)
+        self.recording_label.setFixedSize(65, 50)
+
+        self.recording_label.setText('<span style="color: red;">촬영중</span>')
+        self.recording_label.setAlignment(Qt.AlignVCenter)
+        self.recording_label.hide()
+
+        self.video_container_layout.addWidget(self.video_label)
+        self.video_container_layout.addWidget(self.recording_label, 0, Qt.AlignTop | Qt.AlignRight)
+
+        self.main_layout.addWidget(self.video_container)
 
         self.tabs = QTabWidget()
         self.main_layout.addWidget(self.tabs)
-
-        self.recording_label = QLabel(self)
-        self.recording_label.setAlignment(Qt.AlignCenter)
-
-        camera_icon = QPixmap('./images/camera.png')
-        self.recording_label.setPixmap(camera_icon)
-        self.recording_label.setStyleSheet("color: red; font-size: 16px")
-        self.recording_label.setText('촬영중')
-
-        self.main_layout.addWidget(self.recording_label)
-        # self.recording_label.hide()
 
 # 비디오 프로세서 앰프 ------------------------------------------------------------------------------------------------         
         self.video_amp_tab = QWidget()
@@ -159,9 +168,11 @@ class App(QMainWindow):
             self.camera_control_sliders[cv2.CAP_PROP_EXPOSURE].setEnabled(True)  
 
     def start_recording(self):
+        self.recording_label.show()
         self.thread.start_capturing()
 
     def stop_recording(self):
+        self.recording_label.hide()
         self.thread.stop_capturing()
 
     @pyqtSlot(np.ndarray)
@@ -174,8 +185,8 @@ class App(QMainWindow):
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
-        p = convert_to_Qt_format.scaled(800, 600, Qt.KeepAspectRatio)
-        return QPixmap.fromImage(p)
+        # p = convert_to_Qt_format.scaled(800, 600, Qt.KeepAspectRatio)
+        return QPixmap.fromImage(convert_to_Qt_format)
 
     def closeEvent(self, event):
         self.thread.stop()
