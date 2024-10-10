@@ -18,6 +18,7 @@ parameters = {
 
 for param_name, param_id in parameters.items():
     value = cap.get(param_id)
-    print(f"{param_name}: {value}")
+    if value != -1:
+        print(f"{param_name}: {value}")
 
 cap.release()
