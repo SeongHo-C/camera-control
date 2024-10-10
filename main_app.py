@@ -14,8 +14,8 @@ class App(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-        VIDEO_WIDTH = 800
-        VIDEO_HEIGHT = 600
+        VIDEO_WIDTH = 640
+        VIDEO_HEIGHT = 480
 
         self.main_layout = QVBoxLayout(self.central_widget)
 
@@ -58,12 +58,12 @@ class App(QMainWindow):
         self.video_amp_parameters = {
             "밝기(B)": (cv2.CAP_PROP_BRIGHTNESS, -64, 64, 1, 0),
             "대비(C)": (cv2.CAP_PROP_CONTRAST, 0, 95, 1, 0),
-            "채도(S)": (cv2.CAP_PROP_SATURATION, 0, 255, 1, 100),
+            "채도(S)": (cv2.CAP_PROP_SATURATION, 0, 255, 1, 56),
             "색상(H)": (cv2.CAP_PROP_HUE, -2000, 2000, 1, 0),
             "선명도(P)": (cv2.CAP_PROP_SHARPNESS, 0, 7, 1, 0),
-            "감마(G)": (cv2.CAP_PROP_GAMMA, 64, 300, 1, 100),
-            "화이트 밸런스(W)": (cv2.CAP_PROP_WHITE_BALANCE_BLUE_U, 0, 1, 1, 0),
-            "후광 보정(B)": (cv2.CAP_PROP_BACKLIGHT, 36, 160, 1, 50),
+            "감마(G)": (cv2.CAP_PROP_GAMMA, 64, 300, 1, 110),
+            "후광 보정(B)": (cv2.CAP_PROP_BACKLIGHT, 36, 160, 1, 54),
+            "게인(G)": (cv2.CAP_PROP_GAIN, 0, 1023, 1, 0),
         }
         self.create_sliders(self.video_amp_parameters, self.video_amp_sliders, self.video_amp_slider_labels, self.video_amp_slider_layout)
 
@@ -88,7 +88,7 @@ class App(QMainWindow):
         self.camera_control_parameters = {
             "확대/축소(Z)": (cv2.CAP_PROP_ZOOM, 0, 60, 1, 0),
             "포커스(F)": (cv2.CAP_PROP_FOCUS, 0, 1023, 1, 0),
-            "노출(E)": (cv2.CAP_PROP_EXPOSURE, 1, 8188, 1, 1000),
+            "노출(E)": (cv2.CAP_PROP_EXPOSURE, 1, 5000, 1, 1096),
         }
         self.create_sliders(self.camera_control_parameters, self.camera_control_sliders, self.camera_control_slider_labels, self.camera_control_slider_layout)
 
@@ -146,10 +146,8 @@ class App(QMainWindow):
     def toggle_auto_wb(self, state):
         if state == Qt.Checked:
             self.thread.cap.set(cv2.CAP_PROP_AUTO_WB, 1)
-            self.video_amp_sliders[cv2.CAP_PROP_WHITE_BALANCE_BLUE_U].setEnabled(False)
         else:
             self.thread.cap.set(cv2.CAP_PROP_AUTO_WB, 0)
-            self.video_amp_sliders[cv2.CAP_PROP_WHITE_BALANCE_BLUE_U].setEnabled(True)
 
     def toggle_auto_focus(self, state):
         if state == Qt.Checked:
@@ -185,8 +183,8 @@ class App(QMainWindow):
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
-        # p = convert_to_Qt_format.scaled(800, 600, Qt.KeepAspectRatio)
-        return QPixmap.fromImage(convert_to_Qt_format)
+        p = convert_to_Qt_format.scaled(640, 480, Qt.KeepAspectRatio)
+        return QPixmap.fromImage(p)
 
     def closeEvent(self, event):
         self.thread.stop()
