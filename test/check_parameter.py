@@ -1,29 +1,23 @@
 import cv2
 
-# 카메라 초기화
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
 
-# 파라미터 목록 및 해당 OpenCV 속성
 parameters = {
-    "Brightness": cv2.CAP_PROP_BRIGHTNESS,
-    "Contrast": cv2.CAP_PROP_CONTRAST,
-    "Saturation": cv2.CAP_PROP_SATURATION,
-    "Hue": cv2.CAP_PROP_HUE,
-    "Sharpness": cv2.CAP_PROP_SHARPNESS,
-    "Gamma": cv2.CAP_PROP_GAMMA,
-    "White Balance": cv2.CAP_PROP_WHITE_BALANCE_BLUE_U,
-    "Backlight Contrast": cv2.CAP_PROP_BACKLIGHT,
-    "Zoom": cv2.CAP_PROP_ZOOM,
-    "Focus": cv2.CAP_PROP_FOCUS,
-    "Exposure": cv2.CAP_PROP_EXPOSURE
+    "밝기(B)": cv2.CAP_PROP_BRIGHTNESS,
+    "대비(C)": cv2.CAP_PROP_CONTRAST,
+    "채도(S)": cv2.CAP_PROP_SATURATION,
+    "색상(H)": cv2.CAP_PROP_HUE,
+    "선명도(P)": cv2.CAP_PROP_SHARPNESS,
+    "감마(G)": cv2.CAP_PROP_GAMMA,
+    "후광 보정(B)": cv2.CAP_PROP_BACKLIGHT,
+    "게인(G)": cv2.CAP_PROP_GAIN,
+    "확대/축소(Z)": cv2.CAP_PROP_ZOOM,
+    "포커스(F)": cv2.CAP_PROP_FOCUS,
+    "노출(E)": cv2.CAP_PROP_EXPOSURE
 }
 
-# 파라미터 기본값 출력
-print("Default Camera Parameters:")
 for param_name, param_id in parameters.items():
     value = cap.get(param_id)
-    if value != -1:  # 파라미터가 지원되는 경우에만 출력
-        print(f"{param_name}: {value}")
+    print(f"{param_name}: {value}")
 
-# 카메라 해제
 cap.release()
