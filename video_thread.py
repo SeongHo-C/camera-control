@@ -13,7 +13,7 @@ class VideoThread(QThread):
 
     def __init__(self):
         super().__init__()
-        self.cap = cv2.VideoCapture(1)
+        self.cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 960)
         self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
@@ -25,7 +25,7 @@ class VideoThread(QThread):
         # 10분마다 실행되는 타이머 설정
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.execute_periodic_tasks)
-        self.timer.start(10 * 1000)  # 10분마다 실행
+        self.timer.start(10 * 60 * 1000)
 
         self.running = False
         self.capturing = False
