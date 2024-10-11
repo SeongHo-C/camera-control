@@ -24,7 +24,7 @@ class VideoThread(QThread):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.execute_periodic_tasks)
-        self.timer.start(10 * 60 * 1000) # 10분마다 실행
+        self.timer.start(5 * 60 * 1000) # 5분마다 실행
 
         self.running = False
         self.capturing = False
@@ -35,6 +35,7 @@ class VideoThread(QThread):
         while self.running:
             ret, frame = self.cap.read()
             if ret:
+                self.current_frame = frame
                 # 현재 프레임이 수신되었음을 GUI에 알리고, 그 프레임을 신호와 함께 전송
                 self.change_pixmap_signal.emit(frame)
 
@@ -78,9 +79,8 @@ class VideoThread(QThread):
         return np.mean(gray)    
 
     def execute_periodic_tasks(self):
-        ret, frame = self.cap.read()
-        if ret:
-            brightness = self.calculate_brightness(frame)
+        if self.current_frame is not None:
+            brightness = self.calculate_brightness(self.current_frame)
             print(f"프레임 밝기: {brightness}") 
 
             if brightness < self.brightness_threshold:
@@ -92,6 +92,5 @@ class VideoThread(QThread):
                     print("날이 밝아져서 캡처 시작")
                     self.start_capturing()
 
-        if self.capturing:
             perform_periodic_tasks(self.cap, brightness)
                 
