@@ -2,7 +2,7 @@ import cv2
 import os
 from datetime import datetime
 
-def save_camera_parameters(camera):
+def save_camera_parameters(camera, brightness):
     parameters = {
         "밝기": cv2.CAP_PROP_BRIGHTNESS,
         "대비": cv2.CAP_PROP_CONTRAST,
@@ -28,11 +28,11 @@ def save_camera_parameters(camera):
 
     with open(filename, "a") as f:  # 'a' 모드로 파일 열기 (append)
         if os.stat(filename).st_size == 0:  # 파일이 비어있으면 헤더 추가
-            headers = ["생성일"] + list(parameters.keys())
+            headers = ["생성일", "프레임 밝기"] + list(parameters.keys())
             f.write(", ".join(headers) + "\n")
                 
-        values = [f"{date_str} {time_str}"] + [str(camera.get(prop)) for prop in parameters.values()]
+        values = [f"{date_str} {time_str}, {brightness}"] + [str(camera.get(prop)) for prop in parameters.values()]
         f.write(", ".join(values) + "\n")
         
-def perform_periodic_tasks(camera):
-    save_camera_parameters(camera)
+def perform_periodic_tasks(camera, brightness):
+    save_camera_parameters(camera, brightness)

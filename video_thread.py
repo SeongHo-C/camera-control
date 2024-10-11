@@ -22,14 +22,14 @@ class VideoThread(QThread):
         actual_fps = self.cap.get(cv2.CAP_PROP_FPS)
         print(f'실제 설정 FPS: {actual_fps}')
 
-        # 10분마다 실행되는 타이머 설정
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.execute_periodic_tasks)
-        self.timer.start(10 * 60 * 1000)
+        self.timer.start(10 * 60 * 1000) # 10분마다 실행
 
         self.running = False
         self.capturing = False
         self.last_captured_time = None
+        self.brightness_threshold = 30
 
     def run(self):
         while self.running:
@@ -73,5 +73,25 @@ class VideoThread(QThread):
         
         cv2.imwrite(file_path, frame)
 
+    def calculate_brightness(self, frame):
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        return np.mean(gray)    
+
     def execute_periodic_tasks(self):
-        perform_periodic_tasks(self.cap)
+        ret, frame = self.cap.read()
+        if ret:
+            brightness = self.calculate_brightness(frame)
+            print(f"프레임 밝기: {brightness}") 
+
+            if brightness < self.brightness_threshold:
+                if self.capturing:
+                    print("날이 어두워서 캡처 중지")
+                    self.stop_capturing()   
+            else:
+                if not self.capturing:
+                    print("날이 밝아져서 캡처 시작")
+                    self.start_capturing()
+
+        if self.capturing:
+            perform_periodic_tasks(self.cap, brightness)
+                
