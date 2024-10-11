@@ -4,7 +4,8 @@ import os
 from datetime import datetime, timedelta
 # QThread: 백그라운드 처리에 사용할 스레드를 생성하고 관리하는 데 사용
 # pyqtSignal: 스레드 또는 객체 간의 통신을 위해 방출할 수 있는 신호
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, QTimer
+from periodic_tasks import perform_periodic_tasks
 
 class VideoThread(QThread):
     # 신호가 전송할 데이터의 형식을 지정, 여기서는 NumPy 배열 형식의 데이터를 전달
@@ -12,7 +13,7 @@ class VideoThread(QThread):
 
     def __init__(self):
         super().__init__()
-        self.cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+        self.cap = cv2.VideoCapture(1)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 960)
         self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
@@ -20,6 +21,11 @@ class VideoThread(QThread):
 
         actual_fps = self.cap.get(cv2.CAP_PROP_FPS)
         print(f'실제 설정 FPS: {actual_fps}')
+
+        # 10분마다 실행되는 타이머 설정
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.execute_periodic_tasks)
+        self.timer.start(10 * 1000)  # 10분마다 실행
 
         self.running = False
         self.capturing = False
@@ -44,7 +50,7 @@ class VideoThread(QThread):
 
     def stop(self):
         self.running = False
-        self.wait()
+        self.timer.stop()
         self.cap.release()
 
     def start_capturing(self):
@@ -66,3 +72,6 @@ class VideoThread(QThread):
         file_path = os.path.join(folder_path, file_name)
         
         cv2.imwrite(file_path, frame)
+
+    def execute_periodic_tasks(self):
+        perform_periodic_tasks(self.cap)
